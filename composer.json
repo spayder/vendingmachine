@@ -1,0 +1,15 @@
+{
+    "require": {
+        "php": "^8.5"
+    },
+    "require-dev": {
+        "pestphp/pest": "^5.3",
+        "phpstan/phpstan": "^2.3",
+        "friendsofphp/php-cs-fixer": "^3.95"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
