@@ -113,3 +113,60 @@ describe('subtract', function () {
             ->toThrow(InvalidMoney::class, 'Money cannot be negative, got -5 cents');
     });
 });
+
+describe('fromString', function () {
+    it('parses a decimal amount into cents', function (string $amount, int $expectedCents) {
+        expect(Money::fromString($amount)->cents())->toBe($expectedCents);
+    })->with([
+        'zero' => ['0', 0],
+        'zero with decimals' => ['0.00', 0],
+        'a nickel' => ['0.05', 5],
+        'a dime' => ['0.10', 10],
+        'one decimal means tens of cents' => ['0.5', 50],
+        'a quarter' => ['0.25', 25],
+        'water price' => ['0.65', 65],
+        'whole dollar' => ['1', 100],
+        'whole dollar with decimals' => ['1.00', 100],
+        'soda price' => ['1.50', 150],
+        'large amount' => ['1234.56', 123456],
+        'leading zeros are tolerated' => ['007.5', 750],
+    ]);
+
+    it('rejects text that is not a decimal amount', function (string $amount) {
+        expect(fn() => Money::fromString($amount))
+            ->toThrow(InvalidMoney::class, 'Invalid money amount');
+    })->with([
+        'empty' => [''],
+        'letters' => ['abc'],
+        'negative' => ['-1'],
+        'explicit plus sign' => ['+1'],
+        'leading space' => [' 1'],
+        'trailing space' => ['1 '],
+        'trailing newline' => ["1\n"],
+        'missing fraction digits' => ['1.'],
+        'missing integer part' => ['.5'],
+        'more than two decimals' => ['1.234'],
+        'comma separator' => ['1,50'],
+        'two separators' => ['1.2.3'],
+        'exponent notation' => ['1e2'],
+        'hexadecimal' => ['0x10'],
+        'non-ascii digits' => ['１'],
+    ]);
+
+    it('rejects an amount too large to be stored in cents', function () {
+        expect(fn() => Money::fromString('92233720368547758.08'))
+            ->toThrow(InvalidMoney::class, 'Money overflow');
+    });
+
+    it('accepts the largest amount that fits in cents', function () {
+        expect(Money::fromString('92233720368547758.07')->cents())->toBe(PHP_INT_MAX);
+    });
+});
+
+describe('string round trip', function () {
+    it('parses back what toString produced', function (int $cents) {
+        $money = Money::fromCents($cents);
+
+        expect(Money::fromString($money->toString())->cents())->toBe($cents);
+    })->with([0, 1, 5, 10, 25, 65, 99, 100, 101, 150, 123456, PHP_INT_MAX]);
+});

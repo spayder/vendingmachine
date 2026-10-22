@@ -20,4 +20,9 @@ final class InvalidMoney extends \DomainException
     {
         return new self('Money overflow');
     }
+
+    public static function invalidFormat(string $amount): self
+    {
+        return new self("Invalid money amount: {$amount}");
+    }
 }
