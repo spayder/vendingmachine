@@ -2,7 +2,7 @@ DEV := docker compose run --rm dev
 
 .DEFAULT_GOAL := help
 
-.PHONY: help up down build test coverage shell
+.PHONY: help up down build test coverage shell cs cs-fix
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "} {printf "  %-12s %s\n", $$1, $$2}'
@@ -21,3 +21,9 @@ coverage: ## Run tests with coverage
 
 shell: ## Open a shell in the dev container
 	docker compose run --rm dev sh
+
+cs: ## Check code style (no changes)
+	$(DEV) vendor/bin/php-cs-fixer fix --dry-run --diff
+
+cs-fix: ## Fix code style
+	$(DEV) vendor/bin/php-cs-fixer fix
