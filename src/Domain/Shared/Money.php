@@ -13,13 +13,23 @@ final readonly class Money
         }
     }
 
-    public static function fromCents(int $cents): self
+    public static function fromCents(int $cents): Money
     {
         return new self($cents);
+    }
+
+    public static function zero(): Money
+    {
+        return new self(0);
     }
 
     public function cents(): int
     {
         return $this->cents;
+    }
+
+    public function isZero(): bool
+    {
+        return $this->cents === 0;
     }
 }
