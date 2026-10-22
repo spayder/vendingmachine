@@ -1,4 +1,7 @@
 {
+    "name": "vendingmachine/vendingmachine",
+    "description": "A vending machine simulation project.",
+    "license": "proprietary",
     "require": {
         "php": "^8.5"
     },
@@ -10,6 +13,16 @@
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "VendingMachine\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "VendingMachine\\Tests\\": "tests/"
         }
     }
 }
