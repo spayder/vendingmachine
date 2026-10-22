@@ -15,4 +15,9 @@ final class InvalidMoney extends \DomainException
     {
         return new self("Money cannot be negative, got {$cents} cents");
     }
+
+    public static function overflow(): self
+    {
+        return new self('Money overflow');
+    }
 }

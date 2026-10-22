@@ -37,4 +37,26 @@ final readonly class Money
     {
         return sprintf('%d.%02d', intdiv($this->cents, 100), $this->cents % 100);
     }
+
+    public function add(self $other): self
+    {
+        $sum = $this->cents + $other->cents;
+
+        if (is_float($sum)) {
+            throw InvalidMoney::overflow();
+        }
+
+        return new self($sum);
+    }
+
+    public function subtract(self $other): self
+    {
+        $difference = $this->cents - $other->cents;
+
+        if ($difference < 0) {
+            throw InvalidMoney::negativeAmount($difference);
+        }
+
+        return new self($difference);
+    }
 }
