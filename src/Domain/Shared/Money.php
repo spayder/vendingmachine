@@ -40,13 +40,11 @@ final readonly class Money
 
     public function add(self $other): self
     {
-        $sum = $this->cents + $other->cents;
-
-        if (is_float($sum)) {
+        if ($other->cents > PHP_INT_MAX - $this->cents) {
             throw InvalidMoney::overflow();
         }
 
-        return new self($sum);
+        return new self($this->cents + $other->cents);
     }
 
     public function subtract(self $other): self

@@ -78,6 +78,12 @@ describe('add', function () {
         expect(fn() => Money::fromCents(PHP_INT_MAX)->add(Money::fromCents(1)))
             ->toThrow(InvalidMoney::class, 'Money overflow');
     });
+
+    it('accepts a sum that lands exactly on the maximum', function () {
+        $sum = Money::fromCents(PHP_INT_MAX - 1)->add(Money::fromCents(1));
+
+        expect($sum->cents())->toBe(PHP_INT_MAX);
+    });
 });
 
 describe('subtract', function () {
