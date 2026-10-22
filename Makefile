@@ -1,8 +1,8 @@
-DEV := docker compose run --rm dev
+DEV ?= docker compose run --rm dev
 
 .DEFAULT_GOAL := help
 
-.PHONY: help up down build test coverage shell cs cs-fix
+.PHONY: help up down install test coverage shell cs cs-fix stan ci
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "} {printf "  %-12s %s\n", $$1, $$2}'
@@ -12,6 +12,9 @@ up: ## Start the app on http://localhost:8080
 
 down: ## Stop and remove containers
 	docker compose down
+
+install: ## Install composer dependencies
+	$(DEV) composer install
 
 test: ## Run the test suite
 	$(DEV) vendor/bin/pest
@@ -27,3 +30,8 @@ cs: ## Check code style (no changes)
 
 cs-fix: ## Fix code style
 	$(DEV) vendor/bin/php-cs-fixer fix
+
+stan: ## Run static analysis
+	$(DEV) vendor/bin/phpstan analyse --no-progress
+
+ci: cs stan test ## Run the full quality gate

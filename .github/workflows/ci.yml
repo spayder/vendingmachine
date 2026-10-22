@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      DEV: docker compose run --rm -T dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dev image
+        run: docker compose build dev
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Quality gate (style, static analysis, tests)
+        run: make ci
