@@ -35,3 +35,19 @@ describe('isZero', function () {
         'a dollar' => [100, false],
     ]);
 });
+
+describe('toString', function () {
+    it('formats the amount with two decimals', function (int $cents, string $expected) {
+        expect(Money::fromCents($cents)->toString())->toBe($expected);
+    })->with([
+        'zero' => [0, '0.00'],
+        'one cent' => [1, '0.01'],
+        'a nickel' => [5, '0.05'],
+        'a dime' => [10, '0.10'],
+        'a quarter' => [25, '0.25'],
+        'water price' => [65, '0.65'],
+        'a dollar' => [100, '1.00'],
+        'soda price' => [150, '1.50'],
+        'large amount' => [123456, '1234.56'],
+    ]);
+});

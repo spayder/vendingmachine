@@ -13,12 +13,12 @@ final readonly class Money
         }
     }
 
-    public static function fromCents(int $cents): Money
+    public static function fromCents(int $cents): self
     {
         return new self($cents);
     }
 
-    public static function zero(): Money
+    public static function zero(): self
     {
         return new self(0);
     }
@@ -31,5 +31,10 @@ final readonly class Money
     public function isZero(): bool
     {
         return $this->cents === 0;
+    }
+
+    public function toString(): string
+    {
+        return sprintf('%d.%02d', intdiv($this->cents, 100), $this->cents % 100);
     }
 }
