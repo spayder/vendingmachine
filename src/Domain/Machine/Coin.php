@@ -36,4 +36,15 @@ enum Coin: int
 
         return true;
     }
+
+    /**
+     * @return list<self>
+     */
+    public static function changeable(): array
+    {
+        return array_values(array_filter(
+            self::cases(),
+            static fn(self $coin): bool => $coin->isChangeable(),
+        ));
+    }
 }

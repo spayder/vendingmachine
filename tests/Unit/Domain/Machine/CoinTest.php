@@ -65,3 +65,9 @@ describe('fromString', function () {
         expect(fn() => Coin::fromString('quarter'))->toThrow(InvalidMoney::class);
     });
 });
+
+describe('changeable', function () {
+    it('lists the coins the machine can hand back', function () {
+        expect(Coin::changeable())->toBe([Coin::Nickel, Coin::Dime, Coin::Quarter]);
+    });
+});
