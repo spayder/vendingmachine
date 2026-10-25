@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-
+use VendingMachine\Domain\Machine\Coin;
 use VendingMachine\Domain\Machine\CoinBag;
 use VendingMachine\Domain\Machine\Inventory;
 use VendingMachine\Domain\Machine\MachineId;
@@ -35,4 +35,16 @@ function machine(?CoinBag $availableChange = null, ?Inventory $inventory = null)
         $inventory ?? stockedInventory(),
         $availableChange ?? CoinBag::empty(),
     );
+}
+
+/**
+ * Inserts the coins in order and hands the machine back, so a scenario reads in one line.
+ */
+function insertCoins(VendingMachine $machine, Coin ...$coins): VendingMachine
+{
+    foreach ($coins as $coin) {
+        $machine->insert($coin);
+    }
+
+    return $machine;
 }

@@ -52,4 +52,34 @@ final class VendingMachine
         $this->inserted = CoinBag::empty();
         return $coins;
     }
+
+    public function purchase(Selector $selector, ChangeMaker $changeMaker): PurchaseResult
+    {
+        $slot = $this->inventory->get($selector);
+        if (!$slot->isAvailable()) {
+            throw OutOfStock::forSelector($selector);
+        }
+
+        $insertedTotal = $this->inserted->total();
+        if ($insertedTotal->isLessThan($slot->price())) {
+            throw InsufficientFunds::forPurchase($selector, $slot->price(), $insertedTotal);
+        }
+
+        $owed = $insertedTotal->subtract($slot->price());
+        $heldCoins = $this->availableChange->merge($this->inserted);
+
+        $change = $changeMaker->makeChange($owed, $heldCoins);
+        if ($change === null) {
+            throw CannotMakeChange::for($owed);
+        }
+
+        $inventory = $this->inventory->replace($slot->dispenseOne());
+        $availableChange = $heldCoins->subtract($change);
+
+        $this->inventory = $inventory;
+        $this->availableChange = $availableChange;
+        $this->inserted = CoinBag::empty();
+
+        return PurchaseResult::create($selector, $change);
+    }
 }
