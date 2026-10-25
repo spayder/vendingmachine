@@ -82,4 +82,14 @@ final class VendingMachine
 
         return PurchaseResult::create($selector, $change);
     }
+
+    public function service(Inventory $inventory, CoinBag $availableChange): void
+    {
+        if (!$this->inserted->isEmpty()) {
+            throw SessionInProgressException::withInserted($this->inserted->total());
+        }
+
+        $this->inventory = $inventory;
+        $this->availableChange = $availableChange;
+    }
 }
