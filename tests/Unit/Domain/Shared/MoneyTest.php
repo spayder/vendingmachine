@@ -170,3 +170,19 @@ describe('string round trip', function () {
         expect(Money::fromString($money->toString())->cents())->toBe($cents);
     })->with([0, 1, 5, 10, 25, 65, 99, 100, 101, 150, 123456, PHP_INT_MAX]);
 });
+
+describe('isLessThan', function () {
+    it('compares two amounts', function (int $left, int $right, bool $expected) {
+        expect(Money::fromCents($left)->isLessThan(Money::fromCents($right)))->toBe($expected);
+    })->with([
+        'smaller' => [5, 10, true],
+        'one cent smaller' => [64, 65, true],
+        'equal' => [65, 65, false],
+        'one cent larger' => [66, 65, false],
+        'larger' => [100, 65, false],
+        'zero against something' => [0, 1, true],
+        'zero against zero' => [0, 0, false],
+        'extremes' => [PHP_INT_MAX - 1, PHP_INT_MAX, true],
+    ]);
+
+});

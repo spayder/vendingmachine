@@ -81,4 +81,9 @@ final readonly class Money
 
         return new self($difference);
     }
+
+    public function isLessThan(self $other): bool
+    {
+        return $this->cents < $other->cents;
+    }
 }
