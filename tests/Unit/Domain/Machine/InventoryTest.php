@@ -4,15 +4,8 @@ declare(strict_types=1);
 
 use VendingMachine\Domain\Machine\DuplicateProduct;
 use VendingMachine\Domain\Machine\Inventory;
-use VendingMachine\Domain\Machine\ProductSlot;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\UnknownProduct;
-use VendingMachine\Domain\Shared\Money;
-
-function inventorySlot(string $selector, int $priceCents, int $quantity): ProductSlot
-{
-    return ProductSlot::create(Selector::fromString($selector), Money::fromCents($priceCents), $quantity);
-}
 
 describe('empty', function () {
     it('holds no slots', function () {
@@ -26,24 +19,24 @@ describe('empty', function () {
 
 describe('of', function () {
     it('keeps the slots in the order given', function () {
-        $water = inventorySlot('water', 65, 5);
-        $juice = inventorySlot('juice', 100, 3);
-        $soda = inventorySlot('soda', 150, 2);
+        $water = slotOf('water', 65, 5);
+        $juice = slotOf('juice', 100, 3);
+        $soda = slotOf('soda', 150, 2);
 
         expect(Inventory::of($water, $juice, $soda)->all())->toBe([$water, $juice, $soda]);
     });
 
     it('rejects two slots with the same selector', function () {
         expect(fn() => Inventory::of(
-            inventorySlot('water', 65, 5),
-            inventorySlot('WATER', 70, 1),
+            slotOf('water', 65, 5),
+            slotOf('WATER', 70, 1),
         ))->toThrow(DuplicateProduct::class, 'Duplicate product: WATER');
     });
 });
 
 describe('has', function () {
     it('tells whether a product is stocked, whatever case the selector was written in', function (string $code, bool $expected) {
-        $inventory = Inventory::of(inventorySlot('water', 65, 5));
+        $inventory = Inventory::of(slotOf('water', 65, 5));
 
         expect($inventory->has(Selector::fromString($code)))->toBe($expected);
     })->with([
@@ -53,7 +46,7 @@ describe('has', function () {
     ]);
 
     it('is still true for a sold out product', function () {
-        $inventory = Inventory::of(inventorySlot('water', 65, 0));
+        $inventory = Inventory::of(slotOf('water', 65, 0));
 
         expect($inventory->has(Selector::fromString('water')))->toBeTrue();
     });
@@ -61,14 +54,14 @@ describe('has', function () {
 
 describe('get', function () {
     it('returns the slot for the selector', function () {
-        $water = inventorySlot('water', 65, 5);
-        $inventory = Inventory::of($water, inventorySlot('juice', 100, 3));
+        $water = slotOf('water', 65, 5);
+        $inventory = Inventory::of($water, slotOf('juice', 100, 3));
 
         expect($inventory->get(Selector::fromString('water')))->toBe($water);
     });
 
     it('rejects a selector that is not stocked', function () {
-        $inventory = Inventory::of(inventorySlot('water', 65, 5));
+        $inventory = Inventory::of(slotOf('water', 65, 5));
 
         expect(fn() => $inventory->get(Selector::fromString('tea')))
             ->toThrow(UnknownProduct::class, 'Unknown product: TEA');
@@ -77,9 +70,9 @@ describe('get', function () {
 
 describe('replace', function () {
     it('swaps in the updated slot and keeps its position', function () {
-        $water = inventorySlot('water', 65, 5);
-        $juice = inventorySlot('juice', 100, 3);
-        $soda = inventorySlot('soda', 150, 2);
+        $water = slotOf('water', 65, 5);
+        $juice = slotOf('juice', 100, 3);
+        $soda = slotOf('soda', 150, 2);
         $lessJuice = $juice->dispenseOne();
 
         $updated = Inventory::of($water, $juice, $soda)->replace($lessJuice);
@@ -88,7 +81,7 @@ describe('replace', function () {
     });
 
     it('does not modify the original inventory', function () {
-        $water = inventorySlot('water', 65, 5);
+        $water = slotOf('water', 65, 5);
         $original = Inventory::of($water);
 
         $original->replace($water->dispenseOne());
@@ -97,9 +90,9 @@ describe('replace', function () {
     });
 
     it('rejects a slot whose selector is not stocked, instead of adding it', function () {
-        $inventory = Inventory::of(inventorySlot('water', 65, 5));
+        $inventory = Inventory::of(slotOf('water', 65, 5));
 
-        expect(fn() => $inventory->replace(inventorySlot('tea', 90, 4)))
+        expect(fn() => $inventory->replace(slotOf('tea', 90, 4)))
             ->toThrow(UnknownProduct::class, 'Unknown product: TEA');
     });
 });
