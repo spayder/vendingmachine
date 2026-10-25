@@ -50,7 +50,7 @@ final readonly class CoinBag
     public function add(Coin $coin, int $quantity = 1): self
     {
         if ($quantity < 1) {
-            throw InvalidCoinQuantity::fromQuantity($quantity);
+            throw InvalidCoinQuantityException::fromQuantity($quantity);
         }
 
         $counts = $this->counts;
@@ -83,7 +83,7 @@ final readonly class CoinBag
             $available = $this->quantityOf($coin);
 
             if ($available < $needed) {
-                throw InsufficientCoins::for($coin, $needed, $available);
+                throw InsufficientCoinsException::for($coin, $needed, $available);
             }
 
             if ($available === $needed) {

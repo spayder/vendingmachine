@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use VendingMachine\Domain\Machine\InvalidStock;
-use VendingMachine\Domain\Machine\OutOfStock;
+use VendingMachine\Domain\Machine\InvalidStockException;
+use VendingMachine\Domain\Machine\OutOfStockException;
 use VendingMachine\Domain\Machine\ProductSlot;
 use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Shared\Money;
@@ -28,7 +28,7 @@ describe('create', function () {
 
     it('rejects a negative quantity', function (int $quantity) {
         expect(fn() => waterSlot($quantity))
-            ->toThrow(InvalidStock::class, "Stock cannot be negative, got {$quantity}");
+            ->toThrow(InvalidStockException::class, "Stock cannot be negative, got {$quantity}");
     })->with([-1, -10]);
 });
 
@@ -73,6 +73,6 @@ describe('dispenseOne', function () {
 
     it('refuses to dispense from an empty slot', function () {
         expect(fn() => waterSlot(0)->dispenseOne())
-            ->toThrow(OutOfStock::class, 'Out of stock: WATER');
+            ->toThrow(OutOfStockException::class, 'Out of stock: WATER');
     });
 });

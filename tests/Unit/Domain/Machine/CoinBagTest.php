@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use VendingMachine\Domain\Machine\Coin;
 use VendingMachine\Domain\Machine\CoinBag;
-use VendingMachine\Domain\Machine\InsufficientCoins;
-use VendingMachine\Domain\Machine\InvalidCoinQuantity;
+use VendingMachine\Domain\Machine\InsufficientCoinsException;
+use VendingMachine\Domain\Machine\InvalidCoinQuantityException;
 
 describe('empty', function () {
     it('holds no coins', function () {
@@ -76,7 +76,7 @@ describe('add', function () {
 
     it('rejects a quantity below one', function (int $quantity) {
         expect(fn() => CoinBag::empty()->add(Coin::Dime, $quantity))
-            ->toThrow(InvalidCoinQuantity::class, "Coin quantity must be at least 1, got {$quantity}");
+            ->toThrow(InvalidCoinQuantityException::class, "Coin quantity must be at least 1, got {$quantity}");
     })->with([0, -1, -10]);
 });
 
@@ -133,19 +133,19 @@ describe('subtract', function () {
 
     it('rejects removing more coins than the bag holds', function () {
         expect(fn() => CoinBag::of(Coin::Dime)->subtract(CoinBag::of(Coin::Dime, Coin::Dime)))
-            ->toThrow(InsufficientCoins::class, 'Cannot remove');
+            ->toThrow(InsufficientCoinsException::class, 'Cannot remove');
     });
 
     it('rejects removing a coin the bag does not hold', function () {
         expect(fn() => CoinBag::of(Coin::Dime)->subtract(CoinBag::of(Coin::Quarter)))
-            ->toThrow(InsufficientCoins::class, 'Cannot remove');
+            ->toThrow(InsufficientCoinsException::class, 'Cannot remove');
     });
 
     it('does not modify the operand when it fails', function () {
         $bag = CoinBag::of(Coin::Dime);
 
         expect(fn() => $bag->subtract(CoinBag::of(Coin::Dime, Coin::Dime)))
-            ->toThrow(InsufficientCoins::class)
+            ->toThrow(InsufficientCoinsException::class)
             ->and($bag->quantityOf(Coin::Dime))->toBe(1);
 
     });

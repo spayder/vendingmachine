@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use VendingMachine\Domain\Machine\InvalidMachineId;
+use VendingMachine\Domain\Machine\InvalidMachineIdException;
 use VendingMachine\Domain\Machine\MachineId;
 
 describe('fromString', function () {
@@ -17,7 +17,7 @@ describe('fromString', function () {
 
     it('rejects identifiers that are empty, padded or contain odd characters', function (string $value) {
         expect(fn() => MachineId::fromString($value))
-            ->toThrow(InvalidMachineId::class, 'Invalid machine id');
+            ->toThrow(InvalidMachineIdException::class, 'Invalid machine id');
     })->with([
         'empty' => [''],
         'only spaces' => ['   '],

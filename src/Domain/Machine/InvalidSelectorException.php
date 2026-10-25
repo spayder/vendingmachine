@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
-final class OutOfStock extends \DomainException
+final class InvalidSelectorException extends \DomainException
 {
     private function __construct(string $message)
     {
         parent::__construct($message);
     }
 
-    public static function forSelector(Selector $selector): self
+    public static function forValue(string $value): self
     {
-        return new self('Out of stock: ' . $selector->value());
+        return new self('Invalid selector for ' . $value);
     }
 }

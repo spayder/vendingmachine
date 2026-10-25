@@ -16,7 +16,7 @@ final readonly class MachineId
         $withoutSeparators = str_replace(['-', '_'], '', $value);
 
         if (strlen($value) > self::MAX_LENGTH || !ctype_alnum($withoutSeparators)) {
-            throw InvalidMachineId::forValue($value);
+            throw InvalidMachineIdException::forValue($value);
         }
 
         return new self($value);

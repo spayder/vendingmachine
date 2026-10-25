@@ -6,7 +6,7 @@ namespace VendingMachine\Domain\Machine;
 
 use VendingMachine\Domain\Shared\Money;
 
-final class UnsupportedCoin extends \DomainException
+final class UnsupportedCoinException extends \DomainException
 {
     private function __construct(string $message)
     {

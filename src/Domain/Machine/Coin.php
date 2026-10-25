@@ -20,7 +20,7 @@ enum Coin: int
 
     public static function fromMoney(Money $money): self
     {
-        return self::tryFrom($money->cents()) ?? throw UnsupportedCoin::forAmount($money);
+        return self::tryFrom($money->cents()) ?? throw UnsupportedCoinException::forAmount($money);
     }
 
     public static function fromString(string $amount): self

@@ -6,7 +6,7 @@ namespace VendingMachine\Domain\Machine;
 
 use VendingMachine\Domain\Shared\Money;
 
-final class CannotMakeChange extends \DomainException
+final class CannotMakeChangeException extends \DomainException
 {
     private function __construct(string $message)
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
-final class UnknownProduct extends \DomainException
+final class DuplicateProductException extends \DomainException
 {
     private function __construct(string $message)
     {
@@ -13,6 +13,6 @@ final class UnknownProduct extends \DomainException
 
     public static function forSelector(Selector $selector): self
     {
-        return new self('Unknown product: ' . $selector->value());
+        return new self('Duplicate product: ' . $selector->value());
     }
 }

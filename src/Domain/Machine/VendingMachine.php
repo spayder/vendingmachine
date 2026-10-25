@@ -57,12 +57,12 @@ final class VendingMachine
     {
         $slot = $this->inventory->get($selector);
         if (!$slot->isAvailable()) {
-            throw OutOfStock::forSelector($selector);
+            throw OutOfStockException::forSelector($selector);
         }
 
         $insertedTotal = $this->inserted->total();
         if ($insertedTotal->isLessThan($slot->price())) {
-            throw InsufficientFunds::forPurchase($selector, $slot->price(), $insertedTotal);
+            throw InsufficientFundsException::forPurchase($selector, $slot->price(), $insertedTotal);
         }
 
         $owed = $insertedTotal->subtract($slot->price());
@@ -70,7 +70,7 @@ final class VendingMachine
 
         $change = $changeMaker->makeChange($owed, $heldCoins);
         if ($change === null) {
-            throw CannotMakeChange::for($owed);
+            throw CannotMakeChangeException::for($owed);
         }
 
         $inventory = $this->inventory->replace($slot->dispenseOne());

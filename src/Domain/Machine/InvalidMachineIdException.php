@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
-final class InvalidMachineId extends \DomainException
+final class InvalidMachineIdException extends \DomainException
 {
     private function __construct(string $message)
     {

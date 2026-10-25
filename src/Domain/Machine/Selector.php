@@ -13,7 +13,7 @@ final readonly class Selector
     public static function fromString(string $value): self
     {
         if (strlen($value) > self::MAX_LENGTH) {
-            throw InvalidSelector::forValue($value);
+            throw InvalidSelectorException::forValue($value);
         }
 
         // Groups of letters/digits separated by single hyphens. An empty group
@@ -21,7 +21,7 @@ final readonly class Selector
         // because ctype_alnum('') is false.
         foreach (explode('-', $value) as $group) {
             if (!ctype_alnum($group)) {
-                throw InvalidSelector::forValue($value);
+                throw InvalidSelectorException::forValue($value);
             }
         }
 

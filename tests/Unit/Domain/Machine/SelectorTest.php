@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use VendingMachine\Domain\Machine\InvalidSelector;
+use VendingMachine\Domain\Machine\InvalidSelectorException;
 use VendingMachine\Domain\Machine\Selector;
 
 describe('fromString', function () {
@@ -19,7 +19,7 @@ describe('fromString', function () {
 
     it('rejects codes that are not letters, digits and single hyphens', function (string $input) {
         expect(fn() => Selector::fromString($input))
-            ->toThrow(InvalidSelector::class, 'Invalid selector');
+            ->toThrow(InvalidSelectorException::class, 'Invalid selector');
     })->with([
         'empty' => [''],
         'only spaces' => ['   '],

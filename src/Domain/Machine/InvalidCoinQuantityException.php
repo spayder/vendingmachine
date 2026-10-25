@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace VendingMachine\Domain\Machine;
 
-final class InvalidCoinQuantity extends \DomainException
+final class InvalidCoinQuantityException extends \DomainException
 {
     private function __construct(string $message)
     {

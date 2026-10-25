@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use VendingMachine\Domain\Machine\DuplicateProduct;
+use VendingMachine\Domain\Machine\DuplicateProductException;
 use VendingMachine\Domain\Machine\Inventory;
 use VendingMachine\Domain\Machine\Selector;
-use VendingMachine\Domain\Machine\UnknownProduct;
+use VendingMachine\Domain\Machine\UnknownProductException;
 
 describe('empty', function () {
     it('holds no slots', function () {
@@ -30,7 +30,7 @@ describe('of', function () {
         expect(fn() => Inventory::of(
             slotOf('water', 65, 5),
             slotOf('WATER', 70, 1),
-        ))->toThrow(DuplicateProduct::class, 'Duplicate product: WATER');
+        ))->toThrow(DuplicateProductException::class, 'Duplicate product: WATER');
     });
 });
 
@@ -64,7 +64,7 @@ describe('get', function () {
         $inventory = Inventory::of(slotOf('water', 65, 5));
 
         expect(fn() => $inventory->get(Selector::fromString('tea')))
-            ->toThrow(UnknownProduct::class, 'Unknown product: TEA');
+            ->toThrow(UnknownProductException::class, 'Unknown product: TEA');
     });
 });
 
@@ -93,6 +93,6 @@ describe('replace', function () {
         $inventory = Inventory::of(slotOf('water', 65, 5));
 
         expect(fn() => $inventory->replace(slotOf('tea', 90, 4)))
-            ->toThrow(UnknownProduct::class, 'Unknown product: TEA');
+            ->toThrow(UnknownProductException::class, 'Unknown product: TEA');
     });
 });

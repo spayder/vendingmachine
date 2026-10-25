@@ -22,7 +22,7 @@ final readonly class Inventory
             $key = $slot->selector()->value();
 
             if (isset($slots[$key])) {
-                throw DuplicateProduct::forSelector($slot->selector());
+                throw DuplicateProductException::forSelector($slot->selector());
             }
 
             $slots[$key] = $slot;
@@ -37,7 +37,7 @@ final readonly class Inventory
         $selectorValue = $slot->selector()->value();
 
         if (!array_key_exists($selectorValue, $slots)) {
-            throw UnknownProduct::forSelector($slot->selector());
+            throw UnknownProductException::forSelector($slot->selector());
         }
 
         $slots[$selectorValue] = $slot;
@@ -59,7 +59,7 @@ final readonly class Inventory
     public function get(Selector $selector): ProductSlot
     {
         if (!$this->has($selector)) {
-            throw UnknownProduct::forSelector($selector);
+            throw UnknownProductException::forSelector($selector);
         }
 
         return $this->slots[$selector->value()];

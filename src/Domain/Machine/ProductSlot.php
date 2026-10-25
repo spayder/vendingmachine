@@ -11,7 +11,7 @@ final readonly class ProductSlot
     private function __construct(private Selector $selector, private Money $price, private int $quantity)
     {
         if ($quantity < 0) {
-            throw InvalidStock::for($quantity);
+            throw InvalidStockException::for($quantity);
         }
     }
 
@@ -43,7 +43,7 @@ final readonly class ProductSlot
     public function dispenseOne(): self
     {
         if (!$this->isAvailable()) {
-            throw OutOfStock::forSelector($this->selector);
+            throw OutOfStockException::forSelector($this->selector);
         }
 
         return new self(

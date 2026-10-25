@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use VendingMachine\Domain\Shared\InvalidMoney;
+use VendingMachine\Domain\Shared\InvalidMoneyException;
 use VendingMachine\Domain\Shared\Money;
 
 describe('fromCents', function () {
@@ -11,7 +11,7 @@ describe('fromCents', function () {
     })->with([0, 5, 65, 100, 150]);
 
     it('rejects negative amounts', function (int $cents) {
-        expect(fn() => Money::fromCents($cents))->toThrow(InvalidMoney::class, "Money cannot be negative, got {$cents} cents");
+        expect(fn() => Money::fromCents($cents))->toThrow(InvalidMoneyException::class, "Money cannot be negative, got {$cents} cents");
     })->with([-1, -5, -100, PHP_INT_MIN]);
 });
 
@@ -76,7 +76,7 @@ describe('add', function () {
 
     it('rejects a sum that overflows the integer range', function () {
         expect(fn() => Money::fromCents(PHP_INT_MAX)->add(Money::fromCents(1)))
-            ->toThrow(InvalidMoney::class, 'Money overflow');
+            ->toThrow(InvalidMoneyException::class, 'Money overflow');
     });
 
     it('accepts a sum that lands exactly on the maximum', function () {
@@ -110,7 +110,7 @@ describe('subtract', function () {
 
     it('rejects a result below zero', function () {
         expect(fn() => Money::fromCents(5)->subtract(Money::fromCents(10)))
-            ->toThrow(InvalidMoney::class, 'Money cannot be negative, got -5 cents');
+            ->toThrow(InvalidMoneyException::class, 'Money cannot be negative, got -5 cents');
     });
 });
 
@@ -134,7 +134,7 @@ describe('fromString', function () {
 
     it('rejects text that is not a decimal amount', function (string $amount) {
         expect(fn() => Money::fromString($amount))
-            ->toThrow(InvalidMoney::class, 'Invalid money amount');
+            ->toThrow(InvalidMoneyException::class, 'Invalid money amount');
     })->with([
         'empty' => [''],
         'letters' => ['abc'],
@@ -155,7 +155,7 @@ describe('fromString', function () {
 
     it('rejects an amount too large to be stored in cents', function () {
         expect(fn() => Money::fromString('92233720368547758.08'))
-            ->toThrow(InvalidMoney::class, 'Money overflow');
+            ->toThrow(InvalidMoneyException::class, 'Money overflow');
     });
 
     it('accepts the largest amount that fits in cents', function () {

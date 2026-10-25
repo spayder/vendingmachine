@@ -9,7 +9,7 @@ final readonly class Money
     private function __construct(private int $cents)
     {
         if ($cents < 0) {
-            throw InvalidMoney::negativeAmount($cents);
+            throw InvalidMoneyException::negativeAmount($cents);
         }
     }
 
@@ -41,7 +41,7 @@ final readonly class Money
     public static function fromString(string $amount): self
     {
         if (preg_match('/\A(\d+)(?:\.(\d{1,2}))?\z/', $amount, $matches) !== 1) {
-            throw InvalidMoney::invalidFormat($amount);
+            throw InvalidMoneyException::invalidFormat($amount);
         }
 
         $maxWhole = intdiv(PHP_INT_MAX, 100);
@@ -49,14 +49,14 @@ final readonly class Money
 
         // Too many digits to even cast safely: reject before converting
         if (strlen($wholeDigits) > strlen((string) $maxWhole)) {
-            throw InvalidMoney::overflow();
+            throw InvalidMoneyException::overflow();
         }
 
         $whole = (int) $wholeDigits;                               // '' becomes 0
         $cents = (int) str_pad($matches[2] ?? '', 2, '0');         // pads on the right: '5' -> '50'
 
         if ($whole > $maxWhole || ($whole === $maxWhole && $cents > PHP_INT_MAX % 100)) {
-            throw InvalidMoney::overflow();
+            throw InvalidMoneyException::overflow();
         }
 
         return new self($whole * 100 + $cents);
@@ -65,7 +65,7 @@ final readonly class Money
     public function add(self $other): self
     {
         if ($other->cents > PHP_INT_MAX - $this->cents) {
-            throw InvalidMoney::overflow();
+            throw InvalidMoneyException::overflow();
         }
 
         return new self($this->cents + $other->cents);
@@ -76,7 +76,7 @@ final readonly class Money
         $difference = $this->cents - $other->cents;
 
         if ($difference < 0) {
-            throw InvalidMoney::negativeAmount($difference);
+            throw InvalidMoneyException::negativeAmount($difference);
         }
 
         return new self($difference);

@@ -6,7 +6,7 @@ namespace VendingMachine\Domain\Machine;
 
 use VendingMachine\Domain\Shared\Money;
 
-final class InsufficientFunds extends \DomainException
+final class InsufficientFundsException extends \DomainException
 {
     private function __construct(string $message)
     {

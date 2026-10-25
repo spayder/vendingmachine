@@ -3,17 +3,18 @@
 declare(strict_types=1);
 
 use VendingMachine\Domain\Machine\BoundedChangeMaker;
-use VendingMachine\Domain\Machine\CannotMakeChange;
+use VendingMachine\Domain\Machine\CannotMakeChangeException;
 use VendingMachine\Domain\Machine\ChangeMaker;
 use VendingMachine\Domain\Machine\Coin;
 use VendingMachine\Domain\Machine\CoinBag;
-use VendingMachine\Domain\Machine\InsufficientCoins;
-use VendingMachine\Domain\Machine\InsufficientFunds;
+use VendingMachine\Domain\Machine\InsufficientCoinsException;
+use VendingMachine\Domain\Machine\InsufficientFundsException;
 use VendingMachine\Domain\Machine\Inventory;
 use VendingMachine\Domain\Machine\MachineId;
-use VendingMachine\Domain\Machine\OutOfStock;
+use VendingMachine\Domain\Machine\OutOfStockException;
 use VendingMachine\Domain\Machine\Selector;
-use VendingMachine\Domain\Machine\UnknownProduct;
+use VendingMachine\Domain\Machine\SessionInProgressException;
+use VendingMachine\Domain\Machine\UnknownProductException;
 use VendingMachine\Domain\Machine\VendingMachine;
 use VendingMachine\Domain\Shared\Money;
 
@@ -209,7 +210,7 @@ describe('purchase', function () {
             $machine = insertCoins(machine(), Coin::Dollar);
 
             expect(fn() => $machine->purchase(Selector::fromString('tea'), new BoundedChangeMaker()))
-                ->toThrow(UnknownProduct::class, 'Unknown product: TEA');
+                ->toThrow(UnknownProductException::class, 'Unknown product: TEA');
         });
 
         it('rejects a sold out item', function () {
@@ -219,14 +220,14 @@ describe('purchase', function () {
             );
 
             expect(fn() => $machine->purchase(Selector::fromString('water'), new BoundedChangeMaker()))
-                ->toThrow(OutOfStock::class, 'Out of stock: WATER');
+                ->toThrow(OutOfStockException::class, 'Out of stock: WATER');
         });
 
         it('reports a sold out item before asking for more money', function () {
             $machine = machine(null, Inventory::of(slotOf('water', 65, 0)));
 
             expect(fn() => $machine->purchase(Selector::fromString('water'), new BoundedChangeMaker()))
-                ->toThrow(OutOfStock::class);
+                ->toThrow(OutOfStockException::class);
         });
 
         it('rejects a purchase without enough money', function (array $coins) {
@@ -234,7 +235,7 @@ describe('purchase', function () {
             $machine = insertCoins(machine(), ...$coins);
 
             expect(fn() => $machine->purchase(Selector::fromString('water'), new BoundedChangeMaker()))
-                ->toThrow(InsufficientFunds::class, 'Insufficient funds');
+                ->toThrow(InsufficientFundsException::class, 'Insufficient funds');
         })->with([
             'nothing inserted' => [[]],
             'half of the price' => [[Coin::Quarter, Coin::Quarter]],
@@ -246,7 +247,7 @@ describe('purchase', function () {
             $machine = insertCoins(machine(), Coin::Dollar);
 
             expect(fn() => $machine->purchase(Selector::fromString('water'), new BoundedChangeMaker()))
-                ->toThrow(CannotMakeChange::class, 'Cannot make change');
+                ->toThrow(CannotMakeChangeException::class, 'Cannot make change');
         });
 
         it('rejects a sale when the change maker has no answer, whatever the reason', function () {
@@ -259,7 +260,7 @@ describe('purchase', function () {
             $machine = insertCoins(machine(), Coin::Dollar);
 
             expect(fn() => $machine->purchase(Selector::fromString('water'), $refusing))
-                ->toThrow(CannotMakeChange::class);
+                ->toThrow(CannotMakeChangeException::class);
         });
 
         it('changes nothing when the change maker hands out coins the machine does not hold', function () {
@@ -273,7 +274,7 @@ describe('purchase', function () {
             $inventoryBefore = $machine->inventory();
 
             expect(fn() => $machine->purchase(Selector::fromString('water'), $faulty))
-                ->toThrow(InsufficientCoins::class);
+                ->toThrow(InsufficientCoinsException::class);
 
             expect($machine->inventory())->toBe($inventoryBefore)
                 ->and($machine->inventory()->get(Selector::fromString('water'))->quantity())->toBe(10)
@@ -298,23 +299,110 @@ describe('purchase', function () {
             'unknown selector' => [
                 fn() => insertCoins(machine(), Coin::Dollar),
                 'tea',
-                UnknownProduct::class,
+                UnknownProductException::class,
             ],
             'sold out' => [
                 fn() => insertCoins(machine(null, Inventory::of(slotOf('water', 65, 0))), Coin::Dollar),
                 'water',
-                OutOfStock::class,
+                OutOfStockException::class,
             ],
             'not enough money' => [
                 fn() => insertCoins(machine(), Coin::Quarter),
                 'water',
-                InsufficientFunds::class,
+                InsufficientFundsException::class,
             ],
             'cannot make change' => [
                 fn() => insertCoins(machine(), Coin::Dollar),
                 'water',
-                CannotMakeChange::class,
+                CannotMakeChangeException::class,
             ],
         ]);
+    });
+});
+
+describe('service', function () {
+    it('replaces the inventory and the available change', function () {
+        $machine = machine(CoinBag::empty()->add(Coin::Quarter, 5), stockedInventory());
+        $newInventory = Inventory::of(slotOf('tea', 90, 4), slotOf('water', 70, 2));
+        $newChange = CoinBag::empty()->add(Coin::Dime, 8)->add(Coin::Nickel, 3);
+
+        $machine->service($newInventory, $newChange);
+
+        expect($machine->inventory())->toBe($newInventory)
+            ->and($machine->availableChange())->toEqual($newChange);
+    });
+
+    it('can stock a product the machine did not have, with its own price', function () {
+        $machine = machine();
+
+        $machine->service(Inventory::of(slotOf('tea', 90, 4)), CoinBag::empty());
+
+        $tea = $machine->inventory()->get(Selector::fromString('tea'));
+
+        expect($tea->price()->cents())->toBe(90)
+            ->and($tea->quantity())->toBe(4)
+            ->and($machine->inventory()->has(Selector::fromString('soda')))->toBeFalse();
+    });
+
+    it('can empty the machine', function () {
+        $machine = machine(CoinBag::of(Coin::Quarter));
+
+        $machine->service(Inventory::empty(), CoinBag::empty());
+
+        expect($machine->inventory()->all())->toBe([])
+            ->and($machine->availableChange()->isEmpty())->toBeTrue();
+    });
+
+    it('gives the same result when repeated with the same values', function () {
+        $machine = machine();
+        $inventory = Inventory::of(slotOf('tea', 90, 4));
+        $change = CoinBag::of(Coin::Dime, Coin::Dime);
+
+        $machine->service($inventory, $change);
+        $machine->service($inventory, $change);
+
+        expect($machine->inventory())->toBe($inventory)
+            ->and($machine->availableChange())->toEqual($change);
+    });
+
+    it('sells what was just stocked, giving change from the coins just loaded', function () {
+        $machine = machine();
+        $machine->service(Inventory::of(slotOf('tea', 90, 1)), CoinBag::of(Coin::Dime));
+        insertCoins($machine, Coin::Dollar);
+
+        $result = $machine->purchase(Selector::fromString('tea'), new BoundedChangeMaker());
+
+        expect($result->selector()->value())->toBe('TEA')
+            ->and($result->change())->toEqual(CoinBag::of(Coin::Dime));
+    });
+
+    it('rejects servicing while a customer has coins inserted', function () {
+        $machine = insertCoins(machine(), Coin::Quarter);
+
+        expect(fn() => $machine->service(Inventory::empty(), CoinBag::empty()))
+            ->toThrow(SessionInProgressException::class, 'Machine is in use: 0.25 inserted');
+    });
+
+    it('changes nothing when it is rejected', function () {
+        $inventory = stockedInventory();
+        $change = CoinBag::of(Coin::Dime);
+        $machine = insertCoins(machine($change, $inventory), Coin::Quarter);
+
+        expect(fn() => $machine->service(Inventory::empty(), CoinBag::empty()))
+            ->toThrow(SessionInProgressException::class);
+
+        expect($machine->inventory())->toBe($inventory)
+            ->and($machine->availableChange())->toEqual($change)
+            ->and($machine->inserted())->toEqual(CoinBag::of(Coin::Quarter));
+    });
+
+    it('is allowed again once the customer has taken their coins back', function () {
+        $machine = insertCoins(machine(), Coin::Quarter);
+        $machine->returnCoins();
+        $inventory = Inventory::of(slotOf('tea', 90, 4));
+
+        $machine->service($inventory, CoinBag::empty());
+
+        expect($machine->inventory())->toBe($inventory);
     });
 });
