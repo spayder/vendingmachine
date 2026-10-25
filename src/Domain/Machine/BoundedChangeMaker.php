@@ -6,7 +6,7 @@ namespace VendingMachine\Domain\Machine;
 
 use VendingMachine\Domain\Shared\Money;
 
-class BoundedChangeMaker implements ChangeMaker
+final class BoundedChangeMaker implements ChangeMaker
 {
     public function makeChange(Money $money, CoinBag $coinBag): ?CoinBag
     {
