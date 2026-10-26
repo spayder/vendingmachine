@@ -28,7 +28,7 @@ final readonly class CoinBag
 
     public function total(): Money
     {
-        // counts stores coin=>quantity like: [25 => 2, 10 => 1]
+        // $this->counts stores coin=>quantity like: [25 => 2, 10 => 1]
         $cents = 0;
         foreach ($this->counts as $value => $quantity) {
             $cents += $value * $quantity;

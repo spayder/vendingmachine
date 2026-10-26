@@ -406,3 +406,30 @@ describe('service', function () {
         expect($machine->inventory())->toBe($inventory);
     });
 });
+
+describe('restore', function () {
+    it('brings back a machine with the money a customer had already inserted', function () {
+        $machine = VendingMachine::restore(
+            MachineId::fromString('lobby'),
+            stockedInventory(),
+            CoinBag::of(Coin::Dime),
+            CoinBag::of(Coin::Quarter, Coin::Quarter),
+        );
+
+        expect($machine->id()->value())->toBe('lobby')
+            ->and($machine->availableChange())->toEqual(CoinBag::of(Coin::Dime))
+            ->and($machine->inserted())->toEqual(CoinBag::of(Coin::Quarter, Coin::Quarter));
+    });
+
+    it('behaves like any other machine afterwards', function () {
+        $machine = VendingMachine::restore(
+            MachineId::fromString('lobby'),
+            stockedInventory(),
+            CoinBag::empty(),
+            CoinBag::of(Coin::Dollar),
+        );
+
+        expect($machine->returnCoins())->toEqual(CoinBag::of(Coin::Dollar))
+            ->and($machine->inserted()->isEmpty())->toBeTrue();
+    });
+});

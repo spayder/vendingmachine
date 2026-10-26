@@ -150,3 +150,32 @@ describe('subtract', function () {
 
     });
 });
+
+describe('counts', function () {
+    it('is empty for an empty bag', function () {
+        expect(CoinBag::empty()->counts())->toBe([]);
+    });
+
+    it('maps the value of each coin held in cents to how many there are', function () {
+        $bag = CoinBag::empty()->add(Coin::Quarter, 4)->add(Coin::Dollar)->add(Coin::Dime, 2);
+
+        expect($bag->counts())->toBe([25 => 4, 100 => 1, 10 => 2]);
+    });
+
+    it('leaves out coins that are not held', function () {
+        $bag = CoinBag::of(Coin::Dime, Coin::Dime)->subtract(CoinBag::of(Coin::Dime, Coin::Dime));
+
+        expect($bag->counts())->toBe([]);
+    });
+
+    it('can rebuild the same bag through add', function () {
+        $bag = CoinBag::empty()->add(Coin::Nickel, 3)->add(Coin::Dollar, 2);
+
+        $rebuilt = CoinBag::empty();
+        foreach ($bag->counts() as $cents => $quantity) {
+            $rebuilt = $rebuilt->add(Coin::from($cents), $quantity);
+        }
+
+        expect($rebuilt)->toEqual($bag);
+    });
+});
