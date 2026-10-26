@@ -29,8 +29,8 @@ final class VendingMachine
         MachineId $machineId,
         Inventory $inventory,
         CoinBag $availableChange,
-        CoinBag $inserted): self
-    {
+        CoinBag $inserted,
+    ): self {
         $machine = new self($machineId, $inventory, $availableChange);
         $machine->inserted = $inserted;
         return $machine;
