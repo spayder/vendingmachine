@@ -3,7 +3,8 @@
     "description": "A vending machine simulation project.",
     "license": "proprietary",
     "require": {
-        "php": "^8.5"
+        "php": "^8.5",
+      "ext-pdo": "*"
     },
     "require-dev": {
         "pestphp/pest": "^5.3",

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use VendingMachine\Domain\Machine\MachineRepository;
+use VendingMachine\Infrastructure\Persistence\SqliteMachineRepository;
 use VendingMachine\Tests\Support\InMemoryMachineRepository;
 
 /*
@@ -10,4 +11,5 @@ use VendingMachine\Tests\Support\InMemoryMachineRepository;
  */
 dataset('machine repositories', [
     'in memory' => [fn(): MachineRepository => new InMemoryMachineRepository()],
+    'sqlite' => [fn(): MachineRepository => new SqliteMachineRepository(new PDO('sqlite::memory:'))],
 ]);
