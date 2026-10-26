@@ -21,6 +21,21 @@ final class VendingMachine
         return new self($machineId, $inventory, $availableChange);
     }
 
+    /**
+     * Rebuilds a machine from saved state, including a session that was in progress.
+     * Use create() for a new machine.
+     */
+    public static function restore(
+        MachineId $machineId,
+        Inventory $inventory,
+        CoinBag $availableChange,
+        CoinBag $inserted): self
+    {
+        $machine = new self($machineId, $inventory, $availableChange);
+        $machine->inserted = $inserted;
+        return $machine;
+    }
+
     public function id(): MachineId
     {
         return $this->machineId;

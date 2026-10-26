@@ -95,4 +95,14 @@ final readonly class CoinBag
 
         return new self($counts);
     }
+
+    /**
+     * Coin value in cents => quantity, only for coins actually held.
+     *
+     * @return array<int, int>
+     */
+    public function counts(): array
+    {
+        return $this->counts;
+    }
 }
