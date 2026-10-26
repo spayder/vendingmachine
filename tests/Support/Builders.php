@@ -77,3 +77,26 @@ function repositoryWithDefaultMachine(): InMemoryMachineRepository
 
     return $repository;
 }
+
+function repositoryHolding(VendingMachine $machine): InMemoryMachineRepository
+{
+    $repository = new InMemoryMachineRepository();
+    $repository->save($machine);
+
+    return $repository;
+}
+
+/**
+ * Returns the exception the action throws, for tests that need to look inside it.
+ * Fails the test when nothing is thrown.
+ */
+function exceptionThrownBy(Closure $action): Throwable
+{
+    try {
+        $action();
+    } catch (Throwable $exception) {
+        return $exception;
+    }
+
+    \PHPUnit\Framework\Assert::fail('Expected an exception, but none was thrown.');
+}
