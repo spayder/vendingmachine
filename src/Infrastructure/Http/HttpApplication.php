@@ -12,6 +12,7 @@ use VendingMachine\Domain\Machine\BoundedChangeMaker;
 use VendingMachine\Domain\Machine\ChangeMaker;
 use VendingMachine\Domain\Machine\MachineRepository;
 use VendingMachine\Infrastructure\Http\Action\InsertCoinAction;
+use VendingMachine\Infrastructure\Http\Action\PurchaseAction;
 use VendingMachine\Infrastructure\Http\Action\ReturnCoinsAction;
 use VendingMachine\Infrastructure\Persistence\SqliteMachineRepository;
 
@@ -29,6 +30,8 @@ final class HttpApplication
 
         $app->post('/machines/{id}/coins', InsertCoinAction::class);
         $app->delete('/machines/{id}/coins', ReturnCoinsAction::class);
+
+        $app->post('/machines/{id}/purchases', PurchaseAction::class);
 
         $app->addRoutingMiddleware();
         $errors = $app->addErrorMiddleware(false, false, false);
