@@ -16,7 +16,7 @@ use VendingMachine\Domain\Machine\Selector;
 use VendingMachine\Domain\Machine\VendingMachine;
 use VendingMachine\Domain\Shared\Money;
 
-readonly class SqliteMachineRepository implements MachineRepository
+final readonly class SqliteMachineRepository implements MachineRepository
 {
     public function __construct(private PDO $pdo)
     {

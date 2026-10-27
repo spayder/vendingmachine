@@ -3,3 +3,6 @@ parameters:
     paths:
         - src
         - tests
+    excludePaths:
+        # Pest's arch() builds its expectations through magic calls that PHPStan cannot see.
+        - tests/Arch
