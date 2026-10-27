@@ -15,6 +15,8 @@ COPY --from=vendor /app/vendor ./vendor
 COPY src ./src
 COPY public ./public
 COPY bin ./bin
+# Do not announce the PHP version in an X-Powered-By header.
+RUN echo 'expose_php = Off' > "$PHP_INI_DIR/conf.d/zz-hardening.ini"
 # The SQLite file lives here; a named volume mounted on /data keeps it between restarts.
 RUN mkdir /data && chown www-data:www-data /data
 USER www-data

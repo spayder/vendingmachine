@@ -15,6 +15,11 @@ final class UnsupportedCoinException extends \DomainException
 
     public static function forAmount(Money $money): self
     {
-        return new self("Unsupported coin amount: {$money->cents()} cents");
+        $accepted = implode(', ', array_map(
+            static fn(Coin $coin): string => $coin->toMoney()->toString(),
+            Coin::cases(),
+        ));
+
+        return new self("Unsupported coin: {$money->toString()} (accepted: $accepted)");
     }
 }

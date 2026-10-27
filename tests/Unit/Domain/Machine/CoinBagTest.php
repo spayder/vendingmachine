@@ -136,6 +136,11 @@ describe('subtract', function () {
             ->toThrow(InsufficientCoinsException::class, 'Cannot remove');
     });
 
+    it('names the coin as money in the message', function () {
+        expect(fn() => CoinBag::of(Coin::Dime)->subtract(CoinBag::of(Coin::Dime, Coin::Dime)))
+            ->toThrow(InsufficientCoinsException::class, 'Cannot remove 2 x 0.10, only 1 available');
+    });
+
     it('rejects removing a coin the bag does not hold', function () {
         expect(fn() => CoinBag::of(Coin::Dime)->subtract(CoinBag::of(Coin::Quarter)))
             ->toThrow(InsufficientCoinsException::class, 'Cannot remove');

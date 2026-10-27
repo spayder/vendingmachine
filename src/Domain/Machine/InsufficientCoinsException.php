@@ -13,6 +13,6 @@ final class InsufficientCoinsException extends \DomainException
 
     public static function for(Coin $coin, int $quantity, int $available): self
     {
-        return new self("Cannot remove $quantity x $coin->value, only $available available");
+        return new self("Cannot remove $quantity x {$coin->toMoney()->toString()}, only $available available");
     }
 }

@@ -43,6 +43,11 @@ describe('fromMoney', function () {
         expect(fn() => Coin::fromMoney(Money::fromCents($cents)))
             ->toThrow(UnsupportedCoinException::class, 'Unsupported coin');
     })->with([0, 1, 15, 50, 200]);
+
+    it('says which amount was refused and which coins are accepted', function () {
+        expect(fn() => Coin::fromMoney(Money::fromCents(2)))
+            ->toThrow(UnsupportedCoinException::class, 'Unsupported coin: 0.02 (accepted: 0.05, 0.10, 0.25, 1.00)');
+    });
 });
 
 describe('fromString', function () {
