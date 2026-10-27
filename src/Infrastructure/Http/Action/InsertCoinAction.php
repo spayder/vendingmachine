@@ -40,6 +40,7 @@ final readonly class InsertCoinAction
             'inserted' => CoinList::of($inserted),
             'total' => $inserted->total()->toString(),
         ];
+
         $response->getBody()->write(json_encode($result, JSON_THROW_ON_ERROR));
         return $response->withHeader('Content-Type', 'application/json');
     }

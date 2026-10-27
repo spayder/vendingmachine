@@ -11,6 +11,7 @@ use Slim\Factory\AppFactory;
 use VendingMachine\Domain\Machine\BoundedChangeMaker;
 use VendingMachine\Domain\Machine\ChangeMaker;
 use VendingMachine\Domain\Machine\MachineRepository;
+use VendingMachine\Infrastructure\Http\Action\GetMachineStateAction;
 use VendingMachine\Infrastructure\Http\Action\InsertCoinAction;
 use VendingMachine\Infrastructure\Http\Action\PurchaseAction;
 use VendingMachine\Infrastructure\Http\Action\ReturnCoinsAction;
@@ -32,6 +33,8 @@ final class HttpApplication
         $app->delete('/machines/{id}/coins', ReturnCoinsAction::class);
 
         $app->post('/machines/{id}/purchases', PurchaseAction::class);
+
+        $app->get('/machines/{id}', GetMachineStateAction::class);
 
         $app->addRoutingMiddleware();
         $errors = $app->addErrorMiddleware(false, false, false);
