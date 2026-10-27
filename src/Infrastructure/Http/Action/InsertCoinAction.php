@@ -17,6 +17,7 @@ final readonly class InsertCoinAction
 
     /**
      * @param array<string, string> $args route arguments
+     * @throws \JsonException
      */
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
