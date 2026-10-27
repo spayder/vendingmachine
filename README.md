@@ -53,7 +53,7 @@ The task leaves some points open. These are the choices made, and why.
 - **The machine never gives a 1.00 coin as change.** It accepts them, keeps them, and counts them in the
   state, but change is made from 0.05, 0.10 and 0.25 only.
 - **Coins inserted in the current purchase count as available change.** With a price of 0.65 and 0.85 inserted
-  as 2 quarters, 2 dimes and a nickel, the 0.20 change can only be paid with the customer's own dimes.
+  as 2 quarters, 3 dimes and a nickel, the 0.20 change can only be paid with the customer's own dimes.
 - **If exact change cannot be made, the sale is refused and the inserted coins are returned.** The response says
   so (see `SaleRefundedException`). The alternative, keeping the money in the session so the customer can add
   exact coins, was rejected because the customer would be stuck with a machine that cannot finish the sale.
