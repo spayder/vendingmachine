@@ -15,6 +15,7 @@ use VendingMachine\Infrastructure\Http\Action\GetMachineStateAction;
 use VendingMachine\Infrastructure\Http\Action\InsertCoinAction;
 use VendingMachine\Infrastructure\Http\Action\PurchaseAction;
 use VendingMachine\Infrastructure\Http\Action\ReturnCoinsAction;
+use VendingMachine\Infrastructure\Http\Action\ServiceMachineAction;
 use VendingMachine\Infrastructure\Persistence\SqliteMachineRepository;
 
 final class HttpApplication
@@ -35,6 +36,7 @@ final class HttpApplication
         $app->post('/machines/{id}/purchases', PurchaseAction::class);
 
         $app->get('/machines/{id}', GetMachineStateAction::class);
+        $app->put('/machines/{id}/service', ServiceMachineAction::class);
 
         $app->addRoutingMiddleware();
         $errors = $app->addErrorMiddleware(false, false, false);
