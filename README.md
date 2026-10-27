@@ -32,6 +32,15 @@ seed, delete the volume with `docker compose down -v`.
 
 ## Test
 
+The test tools are development dependencies, so install them once after cloning (it runs `composer install` in the
+`dev` container, nothing is needed on the host):
+
+```bash
+make install     # docker compose run --rm dev composer install
+```
+
+Then:
+
 ```bash
 make test        # docker compose run --rm dev vendor/bin/pest
 make coverage    # same, with --coverage
